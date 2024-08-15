@@ -38,6 +38,25 @@
             border-radius: 5px;
             color: #333;
         }
+
+        .json-container {
+            margin-top: 20px;
+        }
+
+        .json-key {
+            font-weight: bold;
+        }
+
+        .json-value {
+            margin-left: 20px;
+        }
+
+        .json-object, .json-array {
+            margin-left: 20px;
+            border-left: 2px solid #ddd;
+            padding-left: 10px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -119,10 +138,36 @@
                         <hr>
                     `;
                     resultadosDiv.innerHTML += resultadoHTML;
+
+                    // Adicionar a exibição do JSON completo
+                    const jsonContainer = document.createElement('div');
+                    jsonContainer.className = 'json-container';
+                    jsonContainer.innerHTML = `<h2>JSON Completo</h2>${jsonToHtml(hit._source)}`;
+                    resultadosDiv.appendChild(jsonContainer);
                 });
             } catch (error) {
                 console.error('Erro:', error);
             }
+        }
+
+        // Função recursiva para converter JSON em HTML
+        function jsonToHtml(json) {
+            let html = '';
+            for (const key in json) {
+                if (json.hasOwnProperty(key)) {
+                    const value = json[key];
+                    if (typeof value === 'object' && value !== null) {
+                        if (Array.isArray(value)) {
+                            html += `<div class="json-key">${key}:</div><div class="json-array">${jsonToHtml(value)}</div>`;
+                        } else {
+                            html += `<div class="json-key">${key}:</div><div class="json-object">${jsonToHtml(value)}</div>`;
+                        }
+                    } else {
+                        html += `<div><span class="json-key">${key}:</span> <span class="json-value">${value}</span></div>`;
+                    }
+                }
+            }
+            return html;
         }
 
         // Carregar a consulta quando a página for carregada
